@@ -612,12 +612,18 @@ class ThreadActivity : SimpleActivity() {
             refreshMenuItems()
             getOrCreateThreadAdapter().apply {
                 val layoutManager = binding.threadMessagesList.layoutManager as LinearLayoutManager
-                val lastPosition = itemCount - 1
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-                val shouldScrollToBottom =
-                    currentList.lastOrNull() != latestThreadItems.lastOrNull() &&
-                            lastPosition - lastVisiblePosition == 1
-                updateMessages(latestThreadItems, if (shouldScrollToBottom) lastPosition else -1)
+                // the user is at the end of the conversation if the last item is at least partly
+                // on screen, or if nothing has been laid out yet (first load)
+                val wasAtBottom = lastVisiblePosition == RecyclerView.NO_POSITION ||
+                        lastVisiblePosition >= itemCount - 1
+                val hasNewLastItem = currentList.lastOrNull() != latestThreadItems.lastOrNull()
+                val scrollPosition = if (wasAtBottom && hasNewLastItem) {
+                    latestThreadItems.lastIndex
+                } else {
+                    -1
+                }
+                updateMessages(latestThreadItems, scrollPosition)
             }
         }
 
