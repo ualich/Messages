@@ -190,6 +190,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- Secondary Android users never get SMS_DELIVER; this listens to SMS_RECEIVED and only notifies. -->
+        <receiver
+            android:name=".receivers.SecondaryUserSmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name="com.android.mms.transaction.PushReceiver"
             android:exported="true"
